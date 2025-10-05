@@ -33,6 +33,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "//wsl.localhost/Ubuntu/home/buffyrr/code/Viscous-Invsicid-Coupling-Solver",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -58,7 +59,8 @@
       <option name="presentableId" value="Default" />
       <updated>1759502219917</updated>
       <workItem from="1759515249532" duration="2064000" />
-      <workItem from="1759599245631" duration="1056000" />
+      <workItem from="1759599245631" duration="3868000" />
+      <workItem from="1759682076850" duration="693000" />
     </task>
     <servers />
   </component>
