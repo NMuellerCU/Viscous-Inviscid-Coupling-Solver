@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="0599af14-8c0b-4481-8b2f-ab5f6030d409" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/panel_method_geometry.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/panel_method_geometry.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,7 +38,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.sourceCode.JavaScript&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -63,7 +63,8 @@
       <workItem from="1759869605829" duration="2000" />
       <workItem from="1759900218802" duration="647000" />
       <workItem from="1759958508188" duration="2224000" />
-      <workItem from="1759964501704" duration="8464000" />
+      <workItem from="1759964501704" duration="10584000" />
+      <workItem from="1760232879073" duration="4974000" />
     </task>
     <servers />
   </component>
