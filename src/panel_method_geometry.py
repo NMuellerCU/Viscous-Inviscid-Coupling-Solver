@@ -40,9 +40,9 @@ def cosine_spacing_bias(N, bias=0, strength=1):
 
 
 # function made to organize the spacing options
-def calc_x(N, bias: float =0.0, strength:float = 1.0, spacing_option="consine"):
+def calc_x(N, bias: float =0.0, strength:float = 1.0, spacing_option="cosine"):
     if spacing_option == "cosine":
-        if bias != 0 | strength != 1:
+        if (bias != 0) or (strength != 1):
             warnings.warn(
                 f"bias ({bias}) and strength ({strength}) are ignored for unbiased cosine spacing.",
                 UserWarning,
@@ -50,7 +50,7 @@ def calc_x(N, bias: float =0.0, strength:float = 1.0, spacing_option="consine"):
             )
         return cosine_spacing(N)
     elif spacing_option == "linear":
-        if bias != 0 | strength != 1:
+        if (bias != 0) or (strength != 1):
             warnings.warn(
                 f"bias ({bias}) and strength ({strength}) are ignored for linear spacing.",
                 UserWarning,
@@ -58,13 +58,76 @@ def calc_x(N, bias: float =0.0, strength:float = 1.0, spacing_option="consine"):
             )
         return linear_spacing(N)
     elif spacing_option == "cosine_bias":
+        if strength < 1:
+            warnings.warn(
+                f"strength ({strength}) is less than 1 and is ignored.",
+            UserWarning,
+            stacklevel = 2
+            )
         return cosine_spacing_bias(N, bias, strength)
+    else:
+        raise ValueError("spacing_option must be cosine, linear, or cosine_bias")
+
+
+
+'''
+x calculations for circle
+'''
+def CIRC_linear_spacing(N):
+#     uniform arc lengths for circle
+#   theta instead of x
+    return np.linspace(0.0, 2*np.pi, N, endpoint=False)
+
+def CIRC_cosine_spacing(N):
+#    cosine spacing, made at 0,1 and scaled to 0,2pi
+#   theta instead of x
+    theta = 0.5*(1.0 - np.cos(np.linspace(0.0, 2*np.pi, N, endpoint=False)))
+    return 2*np.pi * theta
+def CIRC_cosine_spacing_bias(N, bias = 0.0, strength = 1):
+    theta = 0.5 * (1.0 - np.cos(np.linspace(0.0, 2 * np.pi, N, endpoint=False)))
+    strength = max(1.0, float(strength))
+    if bias < 0:
+        theta = theta**strength
+    elif bias > 0:
+        theta = 1.0 - (1.0 - theta)**strength
+    return 2*np.pi * theta
+
+def CIRC_calc_theta(N, bias: float =0.0, strength:float = 1.0, spacing_option="cosine"):
+    if spacing_option == "cosine":
+        if (bias != 0) or (strength != 1):
+            warnings.warn(
+                f"bias ({bias}) and strength ({strength}) are ignored for unbiased cosine spacing.",
+                UserWarning,
+                stacklevel=2
+            )
+        return CIRC_cosine_spacing(N)
+    elif spacing_option == "linear":
+        if (bias != 0) or (strength != 1):
+            warnings.warn(
+                f"bias ({bias}) and strength ({strength}) are ignored for linear spacing.",
+                UserWarning,
+                stacklevel=2
+            )
+        return CIRC_linear_spacing(N)
+    elif spacing_option == "cosine_bias":
+        if strength < 1:
+            warnings.warn(
+                f"strength ({strength}) is less than 1 and is ignored",
+            UserWarning,
+            stacklevel = 2
+            )
+        return CIRC_cosine_spacing_bias(N, bias, strength)
+
+    else:
+        raise ValueError("spacing_option must be cosine, linear, or cosine_bias")
+
+
 
 '''
 Verifications:
 '''
 
-def remove_duplicate_te(xy_all):
+def remove_duplicate(xy_all):
     if np.linalg.norm(xy_all[0] - xy_all[-1]) < 1e-10:
        xy_all = xy_all[:-1]
     return xy_all
@@ -94,7 +157,7 @@ p: location of max camber
 t: thickness 
 n: number of points on surface
  '''
-def naca4series(m: float, p: float, t: float, N: int, closed_te: bool = True, bias: float =0, strength: float =1, spacing_option="cosine") -> np.ndarray:
+def naca4series(m: float = 0.02, p: float = 0.4, t: float = 0.12, N: int = 100, closed_te: bool = True, bias: float =0, strength: float =1, spacing_option="cosine") -> np.ndarray:
 
     x = calc_x(N, bias, strength, spacing_option)
 
@@ -116,7 +179,7 @@ def naca4series(m: float, p: float, t: float, N: int, closed_te: bool = True, bi
     D = 0.2843
     E = 0.1015
     if closed_te:
-        E = 1.036
+        E = .1036
     y = 5 * t * ( A * np.sqrt(x) - B*x - C*x**2 + D*x**3 - E*x**4)
 
     '''
@@ -137,7 +200,7 @@ def naca4series(m: float, p: float, t: float, N: int, closed_te: bool = True, bi
                        2*m/(1-p)**2 * (p-x)
                         )
     # theta
-    theta = np.arctan2(dy_cdx, dy_cdx)
+    theta = np.arctan(dy_cdx, dy_cdx)
 
     x_u = x - y*np.sin(theta)
     x_l = x + y*np.sin(theta)
@@ -147,20 +210,38 @@ def naca4series(m: float, p: float, t: float, N: int, closed_te: bool = True, bi
     x_l_reverse = x_l[::-1]
     y_l_reverse = y_l[::-1]
 
-#  outputs organized in ccw order
+    #  outputs organized in ccw order
     x_all = np.concatenate((x_u, x_l_reverse))
     y_all = np.concatenate((y_u, y_l_reverse))
     xy_all = np.column_stack((x_all, y_all))
+    # cleanup makes sure the coordinate points are clockwise, and removes duplicate values at LE
     xy_all = make_clockwise(xy_all)
     if(closed_te):
-        xy_all = remove_duplicate_te(xy_all)
+        xy_all = remove_duplicate(xy_all)
+    return xy_all
+
+'''
+naca4series: creates naca 4 series airfoil array values
+r: radius
+ '''
+def circle( N: int = 100, bias: float =0, strength: float =1, spacing_option="cosine") -> np.ndarray:
+    x = CIRC_calc_theta(N, bias, strength, spacing_option)
+    x_u = x
+    x_l = x[::-1]
+    y_u = np.sqrt(1 - x**2)
+    y_l = (-y_u)[::-1]
+
+    x_all = np.concatenate((x_u, x_l))
+    y_all = np.concatenate((y_u, y_l))
+    xy_all = np.column_stack((x_all, y_all))
+    xy_all = make_clockwise(xy_all)
     return xy_all
 
 
+# def dynamic_triangle(theta: float = 60, phi: float = 0) -> np.ndarray:
 
-
-
-
+# def polygon (P: int = 4  phi: float = 0, N: int = 100, bias: float =0, strength: float =1, spacing_option="cosine") -> np.ndarray:
+#
 
 
 
