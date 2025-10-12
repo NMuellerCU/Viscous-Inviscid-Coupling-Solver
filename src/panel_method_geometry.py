@@ -63,7 +63,11 @@ def calc_x(N, bias: float =0.0, strength:float = 1.0, spacing_option="consine"):
 '''
 Verifications:
 '''
-# def remove_duplicate_te(xy_all, ):
+
+def remove_duplicate_te(xy_all):
+    if np.linalg.norm(xy_all[0] - xy_all[-1]) < 1e-10:
+       xy_all = xy_all[:-1]
+    return xy_all
 #  check_clockwise: checks if the 2d array stack is clockwise, if not return false
 def check_clockwise(xy_all):
     #  uses shoelace formula, if area A > 0 CCW if A < 0 CW
@@ -74,7 +78,7 @@ def check_clockwise(xy_all):
     for i in range(n):
         x1, y1 = xy_all[i]
         x2, y2 = xy_all[(i+1) % n]
-        s+= x1 * y2 - x2 * y1
+        s+= x1*y2 - x2*y1
     return  s < 0
 
 #  make clockwise: checks if 2d array stack is clockwise, and if not make clockwise
@@ -147,9 +151,10 @@ def naca4series(m: float, p: float, t: float, N: int, closed_te: bool = True, bi
     x_all = np.concatenate((x_u, x_l_reverse))
     y_all = np.concatenate((y_u, y_l_reverse))
     xy_all = np.column_stack((x_all, y_all))
-
     xy_all = make_clockwise(xy_all)
-
+    if(closed_te):
+        xy_all = remove_duplicate_te(xy_all)
+    return xy_all
 
 
 
