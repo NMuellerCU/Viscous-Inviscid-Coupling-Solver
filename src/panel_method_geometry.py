@@ -60,7 +60,29 @@ def calc_x(N, bias: float =0.0, strength:float = 1.0, spacing_option="consine"):
     elif spacing_option == "cosine_bias":
         return cosine_spacing_bias(N, bias, strength)
 
+'''
+Verifications:
+'''
+# def remove_duplicate_te(xy_all, ):
+#  check_clockwise: checks if the 2d array stack is clockwise, if not return false
+def check_clockwise(xy_all):
+    #  uses shoelace formula, if area A > 0 CCW if A < 0 CW
+    #  https://en.wikipedia.org/wiki/Shoelace_formula
+    # Note: this function is O(n) complexity, technically a similar numpy function is faster but also ~O(n), this is more readable so im leaving this
+    s = 0
+    n = len(xy_all)
+    for i in range(n):
+        x1, y1 = xy_all[i]
+        x2, y2 = xy_all[(i+1) % n]
+        s+= x1 * y2 - x2 * y1
+    return  s < 0
 
+#  make clockwise: checks if 2d array stack is clockwise, and if not make clockwise
+def make_clockwise(xy_all):
+    if not(check_clockwise(xy_all)):
+          return xy_all[::-1] # just reverses the order xy_all
+    else:
+        return xy_all
 '''
 naca4series: creates naca 4 series airfoil array values
 m: max camber
@@ -112,6 +134,21 @@ def naca4series(m: float, p: float, t: float, N: int, closed_te: bool = True, bi
                         )
     # theta
     theta = np.arctan2(dy_cdx, dy_cdx)
+
+    x_u = x - y*np.sin(theta)
+    x_l = x + y*np.sin(theta)
+    y_u = y_c + y*np.cos(theta)
+    y_l = y_c - y * np.cos(theta)
+
+    x_l_reverse = x_l[::-1]
+    y_l_reverse = y_l[::-1]
+
+#  outputs organized in ccw order
+    x_all = np.concatenate((x_u, x_l_reverse))
+    y_all = np.concatenate((y_u, y_l_reverse))
+    xy_all = np.column_stack((x_all, y_all))
+
+    xy_all = make_clockwise(xy_all)
 
 
 
