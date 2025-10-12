@@ -49,3 +49,5 @@ Fundamentals of Aerodynamics, J. D. Anderson 6th Edition, McGraw
 Panel Method Geometry - JoshTheEngineer
 https://www.youtube.com/watch?v=kIqxbd937PI
 
+
+
