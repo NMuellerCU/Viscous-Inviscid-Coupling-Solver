@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib as mpl
 import warnings
+from typing import Literal
+
 
 """One-line summary in the imperative (what it does).
 
