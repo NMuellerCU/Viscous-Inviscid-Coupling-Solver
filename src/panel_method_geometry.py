@@ -190,6 +190,16 @@ def naca4series(m: float = 0.02, p: float = 0.4, t: float = 0.12, N: int = 100, 
     https://numpy.org/doc/2.3/reference/generated/numpy.where.html
     https://en.wikipedia.org/wiki/NACA_airfoil
     '''
+    if((m == 0) or (p == 0)):
+        x_u = x
+        x_l = (x_u)[::-1]
+        y_u = y
+        y_l = (-y_u)[::-1]
+
+        x_all = np.concatenate((x_u, x_l))
+        y_all = np.concatenate((y_u, y_l))
+        xy_all = np.column_stack((x_all, y_all))
+        return xy_all
     y_c = np.where(x < p,
                    m/p**2 *(2*p*x - x**2),
                    m/(1-p)**2 *((1-2*p) + 2*p*x - x**2)
@@ -223,19 +233,18 @@ def naca4series(m: float = 0.02, p: float = 0.4, t: float = 0.12, N: int = 100, 
 '''
 naca4series: creates naca 4 series airfoil array values
 r: radius
+center_x/center_y = the centerpoints of the circle
  '''
 def circle( N: int = 100, bias: float =0, strength: float =1, spacing_option="cosine") -> np.ndarray:
-    x = CIRC_calc_theta(N, bias, strength, spacing_option)
-    x_u = x
-    x_l = x[::-1]
-    y_u = np.sqrt(1 - x**2)
-    y_l = (-y_u)[::-1]
+    r = 0.5
+    center_x = 0.5
+    center_y = 0.0
+    theta = CIRC_calc_theta(N, bias, strength, spacing_option)
 
-    x_all = np.concatenate((x_u, x_l))
-    y_all = np.concatenate((y_u, y_l))
-    xy_all = np.column_stack((x_all, y_all))
-    xy_all = make_clockwise(xy_all)
-    return xy_all
+    x = center_x + r*np.cos(theta)
+    y = center_y + r*np.sin(theta)
+    xy = np.column_stack((x,y))
+    return xy
 
 
 # def dynamic_triangle(theta: float = 60, phi: float = 0) -> np.ndarray:
